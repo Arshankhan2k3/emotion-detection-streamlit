@@ -1,0 +1,7 @@
+streamlit
+opencv-python-headless
+av
+streamlit-webrtc
+tensorflow==2.12
+keras
+numpy
