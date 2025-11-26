@@ -40,7 +40,6 @@ def get_ice_servers():
     return token.ice_servers
 
 ice_servers = get_ice_servers()
-st.write("TURN SERVERS:", ice_servers)
 
 
 # --------------------------------------------
