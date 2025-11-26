@@ -25,7 +25,7 @@ output_details = interpreter.get_output_details()
 
 emotion_labels = ['Angry','Disgust','Fear','Happy','Sad','Surprise','Neutral']
 
-st.write("update Information")
+
 def predict_emotion(face):
 
     # face shape -> (1, 64, 64, 1)
