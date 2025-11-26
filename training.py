@@ -5,6 +5,9 @@ import cv2
 import numpy as np
 import tensorflow as tf
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, WebRtcMode,VideoProcessorBase
+from twilio.rest import Client
+
+
 
 # --------------------------------------------
 # Load FACE DETECTOR
@@ -22,7 +25,7 @@ output_details = interpreter.get_output_details()
 
 emotion_labels = ['Angry','Disgust','Fear','Happy','Sad','Surprise','Neutral']
 
-
+st.write("update Information")
 def predict_emotion(face):
 
     # face shape -> (1, 64, 64, 1)
@@ -30,6 +33,14 @@ def predict_emotion(face):
     interpreter.invoke()
     pred = interpreter.get_tensor(output_details[0]['index'])
     return pred
+
+def get_ice_servers():
+    client = Client(st.secrets["TWILIO_ACCOUNT_SID"], st.secrets["TWILIO_AUTH_TOKEN"])
+    token = client.tokens.create()
+    return token.ice_servers
+
+ice_servers = get_ice_servers()
+st.write("TURN SERVERS:", ice_servers)
 
 
 # --------------------------------------------
@@ -79,28 +90,6 @@ class EmotionProcessor(VideoProcessorBase):
 # --------------------------------------------
 
 
-# webrtc_streamer(
-#     key="emotion-detector",
-#     mode=WebRtcMode.SENDRECV,
-#     # video_transformer_factory=EmotionDetector,
-#     video_processor_factory=EmotionProcessor,
-#     media_stream_constraints={"video": True, "audio": False},
-# )
-
-
-# webrtc_streamer(
-#     key="emotion-detect",
-#     mode=WebRtcMode.SENDRECV,
-#     video_processor_factory=EmotionProcessor,
-#     rtc_configuration={
-#         "iceServers": [
-#             {"urls": ["stun:stun.l.google.com:19302"]},
-#         ]
-#     },
-#     media_stream_constraints={"video": True, "audio": False},
-# )
-
-
 
 
 
@@ -129,19 +118,16 @@ with tab1:
     st.write("👇 Click **Start** to activate your camera & detect emotions in real-time.")
 
     
-   
-    webrtc_streamer(
-        key="emotion-detect",
-        mode=WebRtcMode.SENDRECV,
-        video_processor_factory=EmotionProcessor,
-        rtc_configuration={
-            "iceServers": [
-                {"urls": ["stun:stun.l.google.com:19302"]},
-            ]
-        },
-        media_stream_constraints={"video": True, "audio": False},
-    )
+ 
 
+    webrtc_streamer(
+    key="emotion-detect",
+    mode=WebRtcMode.SENDRECV,
+    video_processor_factory=EmotionProcessor,
+    media_stream_constraints={"video": True, "audio": False},
+    rtc_configuration={"iceServers": ice_servers},
+
+)
 
 # ---------------- TAB 2 ----------------
 with tab2:
